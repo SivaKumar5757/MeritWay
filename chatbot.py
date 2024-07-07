@@ -1,6 +1,7 @@
 import nltk
 # Add this line to download the punkt tokenizer
 nltk.download('punkt')
+nltk.download('wordnet')
 from nltk.stem import WordNetLemmatizer
 from sklearn.feature_extraction.text import CountVectorizer
 from sklearn.metrics.pairwise import cosine_similarity
