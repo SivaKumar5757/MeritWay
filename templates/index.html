@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv='cache-control' content='no-cache'> 
+    <meta http-equiv='expires' content='0'> 
+    <meta http-equiv='pragma' content='no-cache'>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0">
+    <title>MeritWay</title>
+    <link rel="icon" href="/static/logo.png" type="image/png">
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='chat.css') }}">
+</head>
+<body>
+    <div class="background-overlay"></div>
+    <div class="container" style="margin : 10px;    width: 95%;max-width:600px; padding: 30px; background-color: #fff;border-radius: 8px;">
+        <div id="chat-box" class="container">
+            <div id="chat-log"></div>
+        </div>
+        <div id="input-container" class="container">
+            <input type="text" id="user-input" placeholder="Type a message..."/>
+            <button id="send-btn">Send</button>
+        </div>
+        <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+        <script>
+            $(document).ready(function() {
+                // Display the initial message from the bot
+                let username = "{{ session['username'] }}";
+                let initialMessage = "Hello " + (username ? username : "there") + ", I'm Silver. Ask me any study-related suggestion, Don't hesitate to seek clarification if needed.";
+                addBotMessage(initialMessage);
+
+                $('#send-btn').click(function() {
+                    sendMessage();
+                });
+
+                $('#user-input').keypress(function(e) {
+                    if (e.which == 13) {
+                        sendMessage();
+                    }
+                });
+
+                function sendMessage() {
+                    let userMessage = $('#user-input').val().trim();
+                    if (userMessage !== '') {
+                        addUserMessage(userMessage);
+                        $('#user-input').val('');
+
+                        $.ajax({
+                            url: '/user/chat/bot',
+                            type: 'POST',
+                            contentType: 'application/json',
+                            data: JSON.stringify({ message: userMessage }),
+                            success: function(response) {
+                                addBotMessage(response.response);
+                            },
+                            error: function() {
+                                addBotMessage('Error processing your request.');
+                            }
+                        });
+                    }
+                }
+
+                function addUserMessage(message) {
+                    let currentTime = getCurrentTime();
+                    $('#chat-log').append(
+                        '<div class="message-container">' +
+                        '<div class="user-message">' + message + '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;' + 
+                        '<span class="message-time">' + currentTime + '</span>' +
+                        '</div></div>'
+                    );
+                    scrollChatToBottom();
+                }
+
+                function addBotMessage(message) {
+                    let currentTime = getCurrentTime();
+                    $('#chat-log').append(
+                        '<div class="message-container">' +
+                        '<div class="bot-message">' + message + '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;' + 
+                        '<span class="message-time">' + currentTime + '</span>' +
+                        '</div></div>'
+                    );
+                    scrollChatToBottom();
+                }
+
+                function scrollChatToBottom() {
+                    var chatBox = $('#chat-box');
+                    chatBox.scrollTop(chatBox[0].scrollHeight);
+                }
+
+                function getCurrentTime() {
+                    let now = new Date();
+                    return now.getHours() + ':' + (now.getMinutes() < 10 ? '0' : '') + now.getMinutes();
+                }
+            });
+        </script>
+    </div>
+</body>
+</html>

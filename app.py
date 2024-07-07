@@ -1,0 +1,8 @@
+course_recommendations = [
+    "Suggest Advocate Propose Endorse Promote Support Advise Commend Recommend Put forward Approve me a course for machine learning machinelearning", "Our website offers a course titled Machine Learning Mastery. I strongly recommend this for Machine Learning.",
+    "Suggest Advocate Propose Endorse Promote Support Advise Commend Recommend Put forward Approve me a course for artificial intelligence Ai AI", "Our website offers an Artificial Intelligence Specialization course. I strongly recommend this for Artificial Intelligence.",
+    "Suggest Advocate Propose Endorse Promote Support Advise Commend Recommend Put forward Approve me a course for deep learning deeplearning", "Our Deep Learning Nanodegree program is highly recommended for Deep Learning. I strongly suggest this for Deep Learning.",
+    "Suggest Advocate Propose Endorse Promote Support Advise Commend Recommend Put forward Approve me a course for data analysis dataanalysis", "Consider our Data Analysis with Python course. I strongly recommend this for Data Analysis.",
+    "Suggest Advocate Propose Endorse Promote Support Advise Commend Recommend Put forward Approve me a course for big data bigdata", "Our Big Data Specialization course covers essential concepts. I strongly recommend this for Big Data.",
+    "Suggest Advocate Propose Endorse Promote Support Advise Commend Recommend Put forward Approve me a course for data visualization datavisualization datavisualisation data visualisation", "Our Data Visualization with Tableau course is excellent. I strongly recommend this for Data Visualization."
+]

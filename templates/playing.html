@@ -1,0 +1,311 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0">
+    <title>MeritWay</title>
+    <link rel="icon" href="/static/logo.png" type="image/png">
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='chat2.css') }}">
+    <style>
+        body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    background-color: #f0f0f0;
+}
+
+/* Style the vertical scrollbar for the entire window */
+body {
+    overflow-y: scroll; /* Enable vertical scrolling */
+}
+
+/* Customize the appearance of the scrollbar */
+body::-webkit-scrollbar {
+    width: 5px; /* Width of the scrollbar */
+}
+
+body::-webkit-scrollbar-track {
+    background: #f0f0f0; /* Color of the track */
+}
+
+body::-webkit-scrollbar-thumb {
+    background: #888; /* Color of the thumb *//* Rounded corners */
+}
+
+body::-webkit-scrollbar-thumb:hover {
+    background: #555; /* Darker background on hover */
+}
+
+.cont {
+    display: flex;
+    flex-wrap: wrap;
+    margin-top: 30px;
+    gap: 20px;
+    background-color: #fff;
+    padding-top: 20px;
+    border-radius: 10px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+.video-section {
+    box-sizing: border-box;
+    color: #333;
+    padding: 0px 20px;
+    position: relative;
+    background-color: #fff;
+    border-radius: 8px;
+}
+
+.section-list {
+    box-sizing: border-box;
+    color: #333;
+    padding: 0px 20px;
+    position: relative;
+    background-color: #e0e0e0;
+    border-radius: 8px;
+}
+
+.video {
+    margin-top: 0px;
+    width: 100%;
+    height: auto;
+    border-radius: 8px;
+}
+
+.description {
+    margin-top: 20px;
+}
+
+.section-list {
+    padding-top: 20px;
+    width: 30%;
+    display: flex;
+    height: fit-content;
+    flex-direction: column;
+    align-items: flex-start;
+}
+
+.section-list h2 {
+    margin-top: 0;
+}
+
+.section-list ul {
+    list-style-type: none;
+    width: 98%;
+    padding-left: 5px;
+    overflow-y: auto;
+    max-height: 395px; /* Adjust the maximum height as needed */
+    padding-right: 10px; /* Add right padding for the scrollbar */
+}
+
+.section-list ul::-webkit-scrollbar {
+    margin-left: 5px;
+    width: 10px; /* Width of the scrollbar */
+}
+
+.section-list ul::-webkit-scrollbar-thumb {
+    background: #888; /* Color of the thumb */
+    border-radius: 0px; /* Rounded corners */
+}
+
+.section-list ul::-webkit-scrollbar-track {
+    background: #e0e0e0; /* Color of the track */
+}
+
+.section-list ul::-webkit-scrollbar-thumb:hover {
+    background: #555; /* Darker background on hover */
+}
+
+.section-list ul li {
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+    padding: 9px;
+    border-radius: 4px;
+}
+
+.section-list ul li:hover {
+    background-color: #ccc;
+    color: #000;
+}
+
+.current-section {
+    background-color: #888;
+    color: #fff;
+}
+
+/* Media Query for screens up to 990px */
+@media (max-width: 990px) {
+    .cont {
+        flex-direction: column;
+    }
+    .section-list {
+        width: 100%;
+    }
+    .container {
+        width: 95%;
+    }
+}
+
+/* Media Query for screens above 990px */
+@media (min-width: 991px) {
+    .video-section {
+        width: 60%;
+    }
+    .section-list {
+        width: 90%;
+        /* max-width: 600px; */
+        margin: auto;
+    }
+    .container {
+        width: 35%;
+    }
+}
+
+    </style>
+</head>
+<body>
+    <h2 style="background-color: #333; color: #fff;font-size: 25px;font-family: sans-serif;font-weight: 600;padding: 20px 20px 20px 20px;">{{ subpath }}</h2>
+    <div class="cont">
+        
+        <div class="video-section" id="video-section" >
+            <video class="video" controls controlsList="nodownload" autoplay>
+                <source src="{{ course.video[0] }}" type="video/mp4">
+                Your browser does not support the video tag.
+            </video>
+            
+            <div class="description">
+                <h2>Playing Video Description</h2>
+                <p>{{ course.section[0] }}</p>
+            </div>
+        </div>
+        <div class="container" style="margin : 10px;padding:20px 10px; background-color: #525151;border-radius: 8px;">
+            <div id="chat-box" class="container">
+                <div id="chat-log"></div>
+            </div>
+            <div id="input-container" class="container" style="margin-top: 20px;">
+                <input type="text" id="user-input" placeholder="Type a message..."/>
+                <button id="send-btn">Send</button>
+            </div>
+            <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+            <script>
+                $(document).ready(function() {
+                    // Display the initial message from the bot
+                    let username = "{{ session['username'] }}";
+                    let initialMessage = "Hello " + (username ? username : "there") + ", I'm Silver. Ask me any study-related suggestion!";
+                    addBotMessage(initialMessage);
+    
+                    $('#send-btn').click(function() {
+                        sendMessage();
+                    });
+    
+                    $('#user-input').keypress(function(e) {
+                        if (e.which == 13) {
+                            sendMessage();
+                        }
+                    });
+                    function sendMessage() {
+                        let userMessage = $('#user-input').val().trim();
+                        if (userMessage !== '') {
+                            addUserMessage(userMessage);
+                            $('#user-input').val('');
+    
+                            $.ajax({
+                                url: '/user/chat/bot',
+                                type: 'POST',
+                                contentType: 'application/json',
+                                data: JSON.stringify({ message: userMessage }),
+                                success: function(response) {
+                                    addBotMessage(response.response);
+                                },
+                                error: function() {
+                                    addBotMessage('Error processing your request.');
+                                }
+                            });
+                        }
+                    }
+    
+                    function addUserMessage(message) {
+                        let currentTime = getCurrentTime();
+                        $('#chat-log').append(
+                            '<div class="message-container">' +
+                            '<div class="user-message">' + message + '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;' + 
+                            '<span class="message-time">' + currentTime + '</span>' +
+                            '</div></div>'
+                        );
+                        scrollChatToBottom();
+                    }
+    
+                    function addBotMessage(message) {
+                        let currentTime = getCurrentTime();
+                        $('#chat-log').append(
+                            '<div class="message-container">' +
+                            '<div class="bot-message">' + message + '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;' + 
+                            '<span class="message-time">' + currentTime + '</span>' +
+                            '</div></div>'
+                        );
+                        scrollChatToBottom();
+                    }
+    
+                    function scrollChatToBottom() {
+                        var chatBox = $('#chat-box');
+                        chatBox.scrollTop(chatBox[0].scrollHeight);
+                    }
+    
+                    function getCurrentTime() {
+                        let now = new Date();
+                        return now.getHours() + ':' + (now.getMinutes() < 10 ? '0' : '') + now.getMinutes();
+                    }
+                });
+            </script>
+        </div>
+        <div class="section-list" id="section-list">
+            <h2>Sections</h2>
+            <hr style="color: #fff;">
+            <ul>
+                <li class="current-section" onclick="changeVideo('{{course.video[0]}}', '{{course.section[0]}}', this)">
+                    Section 1
+                    <div class="description">
+                        <p>{{ course.section[0] }}</p>
+                    </div>
+                </li>
+                {% for i in range(1,course.nos) %}
+                <li onclick="changeVideo('{{ course.video[i] }}', '{{course.section[i]}}', this)">
+                    Section {{i+1}}
+                    <div class="description">
+                        <p>{{course.section[i]}}</p>
+                    </div>
+                </li>
+                {% endfor %}
+            </ul>       
+        </div>
+        <div style="padding: 20px; background-color: #333;color: #fff;">
+            <h3>About the Course</h3>
+            <p>This data science course covers essential concepts and techniques for analyzing large datasets and extracting valuable insights. Through a combination of lectures, hands-on exercises, and real-world projects, you will learn how to use various data science tools and technologies to solve complex problems.</p>
+            <h3>About the Author</h3>
+            <p>John Doe is a seasoned data scientist with over 10 years of experience in the field. He has worked on numerous projects across industries such as finance, healthcare, and e-commerce. John is passionate about sharing his knowledge and helping others succeed in the field of data science.</p>
+            <h3>Key Features</h3>
+            <ul>
+                <li>Comprehensive coverage of data science fundamentals</li>
+                <li>Hands-on learning with real-world datasets</li>
+                <li>Expert guidance from industry professionals</li>
+                <li>Interactive exercises and quizzes</li>
+                <li>Access to course materials and resources</li>
+            </ul>
+        </div>
+    </div>
+    <script>
+        function changeVideo(videoSrc, description, clickedSection) {
+            var video = document.querySelector('.cont video');
+            video.src = videoSrc;
+            video.play();
+            var videoDescription = document.querySelector('.cont .description');
+            videoDescription.innerHTML = '<h2>Playing Video Description</h2><p>' + description + '</p>';
+
+            var currentSection = document.querySelector('.current-section');
+            currentSection.classList.remove('current-section');
+            clickedSection.classList.add('current-section');
+        }
+    </script>
+</body>
+</html>
