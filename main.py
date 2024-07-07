@@ -6,6 +6,7 @@ from wtforms.validators import DataRequired, Email, EqualTo
 from sqlalchemy import or_
 import coursedata
 from chatbot import get_response
+
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 't\(,$}K*4;pXmxdL:3wyS^hd<g0$a`Os'
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///user.db'
